@@ -1,0 +1,30 @@
+{
+  "name": "erudite-football-academy",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/vercel": "^11.0.16",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.57.0",
+    "astro": "^7.4.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^5.9.2"
+  },
+  "overrides": {
+    "path-to-regexp": "6.3.0",
+    "@vercel/cli-config": {
+      "zod": "^4.6.7"
+    }
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

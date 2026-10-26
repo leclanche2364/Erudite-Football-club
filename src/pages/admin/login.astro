@@ -1,0 +1,12 @@
+---
+export const prerender = false;
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import { actions } from 'astro:actions';
+import { supabaseForRequest } from '../../lib/supabase-server';
+const supabase = supabaseForRequest(Astro.request, Astro.cookies);
+const result = Astro.getActionResult(actions.staffLogin);
+if (result?.data?.success) return Astro.redirect('/admin/applications');
+const { data: { user } } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+if (user) return Astro.redirect('/admin/applications');
+---
+<SiteLayout title="Staff Sign In"><section class="admin-login"><div class="login-card"><p class="eyebrow">Erudite staff</p><h1>Sign in</h1><p>Use the email and password provided by the academy administrator.</p>{result?.error && <p class="login-error" role="alert">{result.error.message}</p>}<form method="POST" action={actions.staffLogin}><div class="form-field"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="username" required /></div><div class="form-field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required /></div><button class="btn" type="submit">Sign in to applications</button></form><a class="back-link" href="/">← Back to academy website</a></div></section><style>.admin-login{min-height:calc(100vh - 12rem);display:grid;place-items:center;padding:3rem 1rem;background:#e9edf2}.login-card{width:min(100%,450px);padding:2rem;background:#fff;border-top:4px solid var(--gold)}.login-card h1{font-size:3.2rem}.login-card>p:not(.eyebrow){font-size:.9rem}.login-card form{margin-top:1.5rem}.login-card .btn{width:100%;cursor:pointer}.login-error{padding:.8rem;background:#fff1f0;color:#a51f1f}.back-link{display:block;margin-top:1.5rem;font-size:.8rem;color:var(--blue)}</style></SiteLayout>

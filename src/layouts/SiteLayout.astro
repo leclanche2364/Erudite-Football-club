@@ -1,0 +1,54 @@
+---
+import '../styles/global.css';
+import { navItems } from '../lib/programs';
+const { title = 'Eruditeballersafrica Football Academy', description = 'Football development and academic preparation for the next generation.' } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#10264e" />
+    <meta name="description" content={description} />
+    <title>{title} | Eruditeballersafrica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="topline"><div class="container topline-inner"><span>Football development. Academic direction.</span><a href="/apply">Applications open <span aria-hidden="true">↗</span></a></div></div>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="/" aria-label="Eruditeballersafrica home"><span class="brand-mark" aria-hidden="true">E</span><span class="brand-name">ERUDITE<span>BALLERSAFRICA</span></span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation"><span></span><span></span></button>
+        <nav id="primary-nav" class="primary-nav" aria-label="Main navigation">
+          {navItems.map((item) => <a href={item.href} aria-current={currentPath === item.href ? 'page' : undefined}>{item.label}</a>)}
+          <a class="nav-apply" href="/apply">Apply <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <div class="container footer-main">
+        <div><a class="brand footer-brand" href="/"><span class="brand-mark" aria-hidden="true">E</span><span class="brand-name">ERUDITE<span>BALLERSAFRICA</span></span></a><p>Scholars are ballers. Building confident players with a clear path for life beyond the pitch.</p></div>
+        <div><h3>Explore</h3><a href="/residency">Erudite Residency</a><a href="/youth">Youth categories</a><a href="/academics">Academics & prep</a><a href="/egg-show">The EGG Show</a></div>
+        <div><h3>Start a conversation</h3><p>Interested in the academy? A parent or guardian can begin an application here.</p><a class="btn" href="/apply">Make an enquiry</a></div>
+      </div>
+      <div class="container footer-bottom"><span>© {new Date().getFullYear()} Eruditeballersafrica Football Academy</span><span><a href="/privacy">Privacy</a> · Scholars are Ballers</span></div>
+    </footer>
+    <script>
+      const menu = document.querySelector<HTMLButtonElement>('.menu-toggle');
+      const nav = document.querySelector<HTMLElement>('.primary-nav');
+      menu?.addEventListener('click', () => {
+        const open = menu.getAttribute('aria-expanded') !== 'true';
+        menu.setAttribute('aria-expanded', String(open));
+        menu.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+        nav?.classList.toggle('is-open', open);
+      });
+    </script>
+    <style>
+      .topline{background:var(--gold);color:var(--navy);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.topline-inner{display:flex;justify-content:space-between;padding:.55rem 0}.topline a{text-decoration:none}.site-header{position:sticky;top:0;z-index:10;background:rgba(16,38,78,.97);color:white}.nav-wrap{min-height:5.3rem;display:flex;align-items:center;justify-content:space-between;gap:2rem}.brand{display:flex;gap:.7rem;align-items:center;text-decoration:none}.brand-mark{width:2.5rem;height:2.5rem;display:grid;place-items:center;background:var(--gold);color:var(--navy);font:800 1.8rem var(--display);transform:skew(-8deg)}.brand-name{font:700 .9rem var(--display);letter-spacing:.1em;line-height:1.05}.brand-name span{display:block;font:600 .57rem 'DM Sans',sans-serif;letter-spacing:.21em;margin-top:.25rem}.primary-nav{display:flex;align-items:center;gap:1.5rem}.primary-nav>a{color:#e2e8f1;text-decoration:none;font-size:.78rem;font-weight:600}.primary-nav>a:hover,.primary-nav>a[aria-current=page]{color:var(--gold)}.primary-nav .nav-apply{background:var(--gold);color:var(--navy);padding:.85rem 1.1rem;text-transform:uppercase;letter-spacing:.08em}.menu-toggle{display:none}.site-footer{background:#0b1c39;color:#fff;padding-top:4rem}.footer-main{display:grid;grid-template-columns:1.2fr .8fr 1fr;gap:4rem;padding-bottom:3rem}.footer-brand{margin-bottom:1rem}.footer-main p{max-width:27rem;color:#aebbd0;font-size:.9rem}.footer-main h3{font:700 .85rem 'DM Sans',sans-serif;letter-spacing:.1em;margin-bottom:1.25rem}.footer-main>div:nth-child(2){display:grid;align-content:start;gap:.75rem}.footer-main>div:nth-child(2) a{font-size:.85rem;color:#c4cedd;text-decoration:none}.footer-bottom{border-top:1px solid #ffffff2b;padding:1.2rem 0;display:flex;justify-content:space-between;color:#aebbd0;font-size:.75rem}.footer-bottom span:last-child{text-transform:uppercase;letter-spacing:.13em}@media(max-width:900px){.menu-toggle{display:grid;gap:5px;background:transparent;border:0;padding:.6rem;cursor:pointer}.menu-toggle span{width:1.5rem;height:2px;background:#fff}.primary-nav{display:none;position:absolute;inset:100% 0 auto;background:var(--navy);padding:1rem 1.5rem 1.5rem;align-items:stretch;flex-direction:column;gap:0}.primary-nav.is-open{display:flex}.primary-nav>a{padding:.9rem .25rem}.primary-nav .nav-apply{text-align:center;margin-top:.5rem}.footer-main{grid-template-columns:1fr 1fr;gap:2rem}.footer-main>div:first-child{grid-column:1/-1}}@media(max-width:520px){.topline-inner{font-size:.62rem}.topline-inner span{max-width:55%}.footer-main{grid-template-columns:1fr}.footer-main>div:first-child{grid-column:auto}.footer-bottom{gap:1rem;flex-direction:column}}
+    </style>
+  </body>
+</html>

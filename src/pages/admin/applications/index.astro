@@ -1,0 +1,23 @@
+---
+export const prerender = false;
+import SiteLayout from '../../../layouts/SiteLayout.astro';
+import { actions } from 'astro:actions';
+import { supabaseForRequest } from '../../../lib/supabase-server';
+const supabase = supabaseForRequest(Astro.request, Astro.cookies);
+if (!supabase) return Astro.redirect('/admin/login');
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) return Astro.redirect('/admin/login');
+const logoutResult = Astro.getActionResult(actions.staffLogout);
+if (logoutResult?.data?.success) return Astro.redirect('/admin/login');
+const status = Astro.url.searchParams.get('status') || '';
+const pathway = Astro.url.searchParams.get('pathway') || '';
+const search = Astro.url.searchParams.get('q')?.trim() || '';
+let query = supabase.from('applications').select('id,created_at,player_name,pathway,guardian_name,guardian_phone,status').order('created_at',{ascending:false}).limit(100);
+if (status) query = query.eq('status', status);
+if (pathway) query = query.eq('pathway', pathway);
+if (search) query = query.or(`player_name.ilike.%${search.replace(/[%,()\\]/g, ' ')}%,guardian_name.ilike.%${search.replace(/[%,()\\]/g, ' ')}%`);
+const { data: applicationRows, error } = await query;
+const applications = applicationRows ?? [];
+const formatDate = (value: string) => new Intl.DateTimeFormat('en-GB',{dateStyle:'medium'}).format(new Date(value));
+---
+<SiteLayout title="Application Review"><section class="admin-shell section"><div class="container"><div class="admin-head"><div><p class="eyebrow">Staff workspace</p><h1>Applications</h1><p>Signed in as {user.email}</p></div><form method="POST" action={actions.staffLogout}><button class="btn btn-outline" type="submit">Sign out</button></form></div><form class="filters" method="GET"><label>Search player or guardian<input type="search" name="q" value={search} placeholder="Name…" /></label><label>Status<select name="status"><option value="">All statuses</option>{['new','reviewing','contacted','closed'].map((item)=><option value={item} selected={status===item}>{item}</option>)}</select></label><label>Pathway<select name="pathway"><option value="">All pathways</option>{['residency','u10','u12','u14','u16'].map((item)=><option value={item} selected={pathway===item}>{item.toUpperCase()}</option>)}</select></label><button class="btn" type="submit">Apply filters</button></form>{error && <div class="notice"><p>Applications could not be loaded. Check your Supabase setup and access policies.</p></div>}{applications.length===0 ? <div class="empty"><h2>No applications found</h2><p>New enquiries will appear here. Try clearing the filters if you expected a result.</p></div> : <div class="table-wrap"><table class="admin-table"><thead><tr><th>Received</th><th>Player</th><th>Pathway</th><th>Guardian</th><th>Status</th><th></th></tr></thead><tbody>{applications.map((app)=><tr><td>{formatDate(app.created_at)}</td><td><strong>{app.player_name}</strong></td><td>{app.pathway.toUpperCase()}</td><td>{app.guardian_name}</td><td><span class={`pill status-${app.status}`}>{app.status}</span></td><td><a class="link-arrow" href={`/admin/applications/${app.id}`}>Review ↗</a></td></tr>)}</tbody></table></div>}<p class="limit-note">Showing the latest 100 applications.</p></div></section><style>.admin-shell{min-height:calc(100vh - 14rem)}.admin-head{display:flex;align-items:center;justify-content:space-between;gap:2rem;margin-bottom:2rem}.admin-head h1{font-size:clamp(3rem,6vw,5rem);margin-bottom:.3rem}.admin-head p:last-child{margin:0}.admin-head form .btn{background:transparent;color:var(--blue);border-color:var(--blue)}.filters{background:#fff;padding:1.2rem;display:flex;align-items:end;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}.filters label{display:grid;gap:.35rem;font-size:.75rem;font-weight:700;flex:1;min-width:150px}.filters input,.filters select{padding:.65rem;border:1px solid var(--line);background:white}.filters .btn{padding:.7rem 1rem}.empty{background:#fff;padding:2rem}.empty h2{font-size:2rem}.limit-note{font-size:.75rem}@media(max-width:600px){.admin-head{align-items:start}.filters{align-items:stretch;flex-direction:column}.filters label{flex:auto}}</style></SiteLayout>
